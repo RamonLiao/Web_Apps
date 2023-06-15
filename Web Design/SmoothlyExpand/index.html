@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Toggle - Smoothly Expandable</title>
+
+    <style>
+      /* Before */
+      /* .expandable {
+        height: 0;
+        overflow: hidden;
+        background: black;
+        color: white;
+        transition: 200ms height ease-in-out; 
+      }
+      .expandable.open {
+        height: auto;
+      } */
+      /* height can't be animated from 0 to auto. No actual distance to be calculated. */
+
+      /* After */
+      /* https://css-tricks.com/snippets/css/complete-guide-grid/ */
+      .wrapper {
+        display: grid;
+        grid-template-rows: 0fr;
+        overflow: hidden;
+        transition: grid-template-rows 200ms;
+      }
+      .wrapper.open {
+        grid-template-rows: 1fr;
+      }
+      .expandable {
+        min-height: 0;
+        background: black;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- https://www.w3schools.com/howto/howto_css_switch.asp -->
+    <button id="toggle">Toggle</button>
+    <div class="wrapper">
+      <div class="expandable" id="expandable">
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Quidem amet
+        aliquid at nesciunt voluptas. Dolore magni quis, saepe asperiores
+        deleniti quas velit praesentium adipisci at dolorum! Labore aspernatur
+        ea quia qui vero consequuntur sequi deleniti repellendus corrupti nam
+        dolores veniam alias nisi itaque nesciunt aperiam distinctio, repellat
+        dicta maxime. Alias aperiam, dolorum expedita odio excepturi, corrupti
+        iure id eum omnis doloribus veniam voluptatem cum! Reiciendis quibusdam
+        incidunt dolorum voluptates repudiandae libero esse, inventore,
+        expedita, magnam veniam eos ex similique deserunt natus! Quod minima
+        deleniti, aut iusto obcaecati magnam sit harum sed et qui aliquam
+        reiciendis pariatur perspiciatis incidunt! Veniam, hic!
+      </div>
+    </div>
+
+    <script>
+      document.getElementById("toggle").onclick = () => {
+        // https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/toggle
+        // document.getElementById("expandable").classList.toggle("open"); // "open" is a class name added to the HTML element, and the new class name will be invoked in CSS!!!
+        document.querySelector(".wrapper").classList.toggle("open");
+      };
+    </script>
+  </body>
+</html>
