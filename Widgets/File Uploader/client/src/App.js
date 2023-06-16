@@ -1,4 +1,3 @@
-import logo from "./logo.svg";
 import "./styles/index.css";
 import Fileuploader from "./components/file-uploader";
 
