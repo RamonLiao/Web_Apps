@@ -6,7 +6,7 @@ dotenv.config();
 const fileRoute = require("./routes").file;
 const cors = require("cors");
 // const path = require("path");
-const port = process.env.PORT || 8000;
+const port = process.env.PORT || 8080;
 
 // connect to DB
 mongoose
