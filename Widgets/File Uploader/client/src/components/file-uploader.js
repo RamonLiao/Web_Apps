@@ -13,34 +13,49 @@ export default function Fileuploader() {
 
   const [fileInfo, setFileInfo] = useState(null);
   const [progress, setProgress] = useState(status.initial);
-  const [dropzoneActive, setDropzoneActive] = useState(false);
-  const [files, setFiles] = useState(null);
+  // const [files, setFiles] = useState(null); // --> [enhancement point]
   const [message, setMessage] = useState("");
 
   const dragOverHandler = (e) => {
     e.preventDefault();
   };
+
   const dropHandler = (e) => {
     e.preventDefault();
+    if (e.dataTransfer.files[0].type !== "text/csv") {
+      setFileInfo(null);
+      setMessage("Please choose a CSV file.");
+      return;
+    }
     setFileInfo(e.dataTransfer.files[0]);
-    setFiles(e.dataTransfer.files);
+    setMessage("");
   };
-  const chooseHandler = (e) => {
-    setFileInfo(e.target.files[0]); // lastModified, lastModifiedDate, name, size, type, webkitRelativePath
-    setFiles(e.target.files);
-  };
-  const uploadHandler = (e) => {
-    setProgress(status.analysing);
-    // Check if a file is selected
 
-    if (!files) {
+  const chooseHandler = (e) => {
+    if (!e.target.files[0]) {
+      setFileInfo(null);
+      setMessage("");
+      return;
+    }
+    if (e.target.files[0].type !== "text/csv") {
+      setFileInfo(null);
+      setMessage("Please choose a CSV file.");
+      return;
+    }
+    setFileInfo(e.target.files[0]); // lastModified, lastModifiedDate, name, size, type, webkitRelativePath
+    setMessage("");
+  };
+
+  const uploadHandler = (e) => {
+    // // Check if a file is selected
+    if (!fileInfo) {
       setMessage("No file selected.");
       setProgress(status.initial);
       return;
     }
-    const file = files[0];
+
+    setProgress(status.analysing);
     const reader = new FileReader();
-    console.log(progress);
   };
 
   return (
@@ -76,7 +91,7 @@ export default function Fileuploader() {
             <h2 className="upload-desccription">
               Submit a file in tabular format (.CSV)
             </h2>
-            {message && <div className="alert alert-danger">{message}</div>}
+
             <button
               className="upload-btn"
               type="submit"
@@ -84,6 +99,7 @@ export default function Fileuploader() {
             >
               Upload
             </button>
+            {message && <div className="alert alert-danger">{message}</div>}
           </div>
         </div>
       )}
@@ -96,7 +112,14 @@ export default function Fileuploader() {
               {(() => {
                 switch (progress) {
                   case status.analysing:
-                    return <p>Analysing...</p>;
+                    return (
+                      <p>
+                        Analysing...
+                        {/* <span className="element"></span>
+                        <span className="element"></span>
+                        <span className="element"></span> */}
+                      </p>
+                    );
                   case status.analysed:
                     return <p>Analysed!</p>;
                   case status.formatError:
@@ -109,7 +132,13 @@ export default function Fileuploader() {
                       }
                     })();
                   case status.uploading:
-                    return <p>Uploading...</p>;
+                    return (
+                      <p>
+                        Uploading<span>.</span>
+                        <span>.</span>
+                        <span>.</span>
+                      </p>
+                    );
                   case status.uploaded:
                     return <p>Uploaded</p>;
                   case status.dbDisconnedted:

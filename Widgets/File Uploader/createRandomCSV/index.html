@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create a CSV file in random size</title>
+
+    <style>
+      * {
+        margin: 0;
+        box-sizing: border-box;
+      }
+      html {
+        height: 100%;
+      }
+      body {
+        min-height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 300px;
+        width: 500px;
+        border-radius: 10px;
+        background: #dcf5c6;
+        margin: 0 auto;
+        border: 2px solid #006100;
+      }
+      .content {
+        margin: 1.5rem;
+      }
+      .fileinfo {
+        margin-bottom: 1.5rem;
+      }
+      .fileinfo input {
+        margin-top: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Create a CSV file in random size</h2>
+      <div class="content">
+        <input
+          type="text"
+          name="filename"
+          id="filename"
+          placeholder="Enter a file name"
+          value="RandomCSV"
+        />
+        <span>.csv</span>
+      </div>
+      <div class="fileinfo">
+        <span
+          ><p class="columns">Columns:</p>
+          <p class="rows">Rows:</p>
+          <p class="size">Filesize:</p></span
+        >
+        <input type="checkbox" name="header" id="header" checked />
+        <label for="header">with header</label>
+      </div>
+      <span
+        ><button type="button" class="create">Create a CSV file</button>
+        <button type="button" class="download">Download</button></span
+      >
+    </div>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
