@@ -87,11 +87,40 @@ The UI diagram is designed with Figma (<a href="https://www.figma.com/file/Icajm
 
 <br/>
 
-## Unsolved Bugs
+## Unsolved Issues
 
-1. **[CSS]** Unable to show ":focus" style to "Choose a file" as keyboard navigation (Tab)
-2. **[CSV]** When creating a csv file, composing a content string exceeds the compacity of the runtime system.
-<figure>
-<img src="./other/StringError.png" >
-<figcaption>Fig.  - String Error</figcaption>
-</figure>
+1.  **[CSS]**
+    Unable to show ":focus" style to "Choose a file" as keyboard navigation (Tab)
+
+2.  **[CSV]**
+    When creating a csv file by using Javascripot, composing a content string exceeds the compacity of the runtime system.
+    <figure>
+    <img src="./other/StringError.png" >
+    <figcaption>Fig.  - String Error</figcaption>
+    </figure>
+
+    Possible solutions:
+
+    2-1. (Browser/client side) Using Javascript to execute a command in cmd and create a csv file locally (no recommed because of cyber security issue!)
+
+    2-2. (Server side) Using Node.js to execute file system to execute a command and create a csv file. The client side needs to invoke a server to execute a command and return the outcome to the client.
+
+    2-3. Using Python. This method needs developers to package programming codes as an application for non-programming user.
+
+3.  **[MongoDB]**
+    MongoDB Atlas provides a free plan for creating a cluster (database) up to 512 MB. According to assumption, the size of upload file is between 1 GB to 5 GB. The following are possible solutions:
+
+    3-1. If data will not be selected or searched based on content, the upload file can be converted into binary file. The binary file can be chunked and stored discretely in different clusters (database). These storing clusters will be handled by a higher level of cluster to manage the file info and storage info.
+
+    |----- Cluster Manage (512 MB) : file info, file storage info
+    |----- Cluster 1 (512 MB) : Chunked file 1
+    |----- Cluster 2 (512 MB) : Chunked file 2
+    |----- Cluster 3 (512 MB) : Chunked file 3
+    |----- ...
+
+    3-2. If data is needed to be selected or searched based on content, the dataset can be grouped by columns and be stored discretely in different clusters (database). A cluster can reference another cluster to create a relation. The bonding of reference can simulate the behaviour of relational database.
+
+    |----- Cluster Manage : file info, file columns info
+    |----- Cluster 1 : file data (column A, column B, column C, ...), ref (Cluster 2)
+    |----- Cluster 2 : file data (column x, column y, column z, ...), ref (Cluster 3)
+    |----- ...

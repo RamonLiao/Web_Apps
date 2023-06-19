@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Papa from "papaparse";
 
 export default function Fileuploader() {
   const status = {
@@ -55,7 +56,32 @@ export default function Fileuploader() {
     }
 
     setProgress(status.analysing);
-    const reader = new FileReader();
+
+    // Parse csv data
+    console.log(fileInfo);
+    try {
+      throw new Error("Format error");
+      Papa.parse(fileInfo, {
+        header: true,
+        skipEmptyLines: true,
+        complete: function (results) {
+          console.log(results.data);
+          // const rowsArray = [];
+          // const valuesArray = [];
+
+          // // Iterating data to get column name and their values
+          // results.data.map((d) => {
+          //   rowsArray.push(Object.keys(d));
+          //   valuesArray.push(Object.values(d));
+          // });
+          setProgress(status.analysed);
+        },
+      });
+    } catch (err) {
+      console.log(err);
+      setMessage(err);
+      setProgress(status.formatError);
+    }
   };
 
   return (
@@ -81,6 +107,7 @@ export default function Fileuploader() {
                   id="upload-label"
                   name="upload-label"
                   onChange={chooseHandler}
+                  accept=".csv"
                 />
                 <label for="upload-label">
                   <span>Choose a file</span> or drag it here!
@@ -107,30 +134,26 @@ export default function Fileuploader() {
       {progress && progress !== status.initial && (
         <div className="progress-group">
           <div className="progress-container">
-            <div className="progress-bar"></div>
+            <div className="progress-bar">
+              <div className="progress-bar-spinner"></div>
+            </div>
             <div className="progress-description">
               {(() => {
                 switch (progress) {
                   case status.analysing:
-                    return (
-                      <p>
-                        Analysing...
-                        {/* <span className="element"></span>
-                        <span className="element"></span>
-                        <span className="element"></span> */}
-                      </p>
-                    );
+                    return <p>Analysing...</p>;
                   case status.analysed:
                     return <p>Analysed!</p>;
                   case status.formatError:
-                    return (() => {
-                      <p>Analysis Failed!</p>;
-                      {
-                        message && (
-                          <div className="alert alert-danger">{message}</div>
-                        );
-                      }
-                    })();
+                    return <p>Analysis Failed!</p>;
+                  // () => {
+                  //   <p>Analysis Failed!</p>;
+                  //   {
+                  //     message && (
+                  //       <div className="alert alert-danger">{message}</div>
+                  //     );
+                  //   }
+                  // };
                   case status.uploading:
                     return (
                       <p>
