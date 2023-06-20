@@ -245,7 +245,58 @@
           }
         }
       }
+      .progress-link-fireworks {
+        z-index: -1;
+
+        #fireworks1 {
+          width: 10vw;
+          height: 10vw;
+          position: absolute;
+          right: 5%;
+          top: 45%;
+          animation: firework 1.6s infinite;
+        }
+        #fireworks2 {
+          width: 15vw;
+          height: 15vw;
+          position: absolute;
+          left: 5%;
+          top: 35%;
+          animation: firework 2s infinite;
+        }
+        #fireworks3 {
+          width: 20vw;
+          height: 20vw;
+          position: absolute;
+          right: 10%;
+          top: 10%;
+          animation: firework 2.4s infinite;
+        }
+      }
     }
+  }
+}
+
+.card {
+  margin: 0.2rem;
+  border-radius: 8px;
+  border: 1px solid #cccccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+  box-sizing: border-box;
+  width: 250px;
+  height: 250px;
+  transition: all linear 200ms;
+
+  & :hover {
+    transform: scale(1.02);
+    transition: all linear 200ms;
+    border-radius: 8px;
+    z-index: 1;
+    box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
   }
 }
 
@@ -285,5 +336,23 @@
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+@keyframes firework {
+  0% {
+    transform: translate(-10%, 10vh) scale(0);
+    /* transform: translate(-50%, 60vh) scale(0); */
+    width: 0.5vim;
+    opacity: 1;
+  }
+  50% {
+    width: 0.5vim;
+    opacity: 1;
+  }
+  100% {
+    /* transform: scale(1); */
+    /* width: 40vmin; */
+    opacity: 0;
   }
 }

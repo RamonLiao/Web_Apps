@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import Papa from "papaparse";
 import { BsArrowRightShort, BsCloudUploadFill } from "react-icons/bs";
+import axios from "axios";
+import { measureUploadSpeed } from "./testSpeed-component";
 
 export default function Fileuploader() {
-  let uploadProgress = 0;
   const status = {
     initial: 1,
     analysing: 2,
@@ -11,14 +12,16 @@ export default function Fileuploader() {
     formatError: 4,
     uploading: 5,
     uploaded: 6,
-    dbDisconnedted: 7,
+    uploadError: 7,
   };
 
-  const [fileInfo, setFileInfo] = useState(null);
   const [progress, setProgress] = useState(status.initial);
+  const [fileInfo, setFileInfo] = useState(null);
   // const [files, setFiles] = useState(null); // --> [enhancement point]
   const [message, setMessage] = useState("");
   const [timeLeft, setTimeLeft] = useState(0);
+  const [parsedData, setParsedData] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const timeConverter = (difference) => {
     let timeObj = {};
@@ -41,11 +44,13 @@ export default function Fileuploader() {
 
     return timeObj;
   };
+
   const dragOverHandler = (e) => {
     e.preventDefault();
   };
 
   const dropHandler = (e) => {
+    console.log("dropHandler");
     e.preventDefault();
     if (e.dataTransfer.files[0].type !== "text/csv") {
       setFileInfo(null);
@@ -57,6 +62,7 @@ export default function Fileuploader() {
   };
 
   const chooseHandler = (e) => {
+    console.log("chooseHandler");
     if (!e.target.files[0]) {
       setFileInfo(null);
       setMessage("");
@@ -72,7 +78,9 @@ export default function Fileuploader() {
   };
 
   const uploadHandler = (e) => {
-    // // Check if a file is selected
+    console.log("uploadHandler");
+
+    // Check if a file is selected
     if (!fileInfo) {
       setMessage("No file selected.");
       setProgress(status.initial);
@@ -81,30 +89,87 @@ export default function Fileuploader() {
 
     setProgress(status.analysing);
 
-    // Parse csv data
     console.log(fileInfo);
+
+    // Test Upload Speed
+    let uploadSpeed = 0;
+    const uploadSizeInBytes = 10 * 1024 * 1024; // Example upload size: 10 MB
+
+    measureUploadSpeed(
+      uploadSizeInBytes,
+      function (uploadSpeedInMbps, uploadSpeedInBytes) {
+        console.log("Upload Speed:", uploadSpeedInMbps.toFixed(2), "Mbps");
+        console.log("Upload Speed:", uploadSpeedInBytes.toFixed(2), "bps");
+        uploadSpeed = uploadSpeedInBytes;
+      }
+    );
+
+    // -------- Method 1: upload csv file & parse data ---------
+    // throw new Error("File format is incorrect!"); //for testing
+    // function uploadCSVFile(file) {
+    //   return new Promise((resolve, reject) => {
+    //     const reader = new FileReader();
+
+    //     reader.onload = function (event) {
+    //       const fileContent = event.target.result;
+    //       console.log("complete reading");
+    //       resolve(fileContent);
+    //     };
+
+    //     reader.onerror = function (event) {
+    //       reject(event.target.error);
+    //     };
+
+    //     reader.readAsBinaryString(file);
+    //   });
+    // }
+
+    // async function parseCSVData() {
+    //   try {
+    //     const csvContent = await uploadCSVFile(fileInfo);
+    //     console.log(csvContent);
+
+    //     const rows = csvContent.split("\n");
+    //     const dataArray = [];
+
+    //     rows.forEach((row) => {
+    //       const columns = row.split("\t");
+    //       dataArray.push(columns);
+    //     });
+
+    //     console.log(dataArray);
+    //     // Prepare parsed data for later upload
+    //     setParsedData(dataArray);
+
+    //     // Calculate Time Left: (file size / internet upload speed)
+    //     setTimeLeft(new Date("2023-06-19T23:09:00") - new Date());
+
+    //     // Render Uploading Page
+    //     setProgress(status.uploading);
+    //   } catch (err) {
+    //     console.log(err.message);
+    //     setMessage(err.message);
+    //     setProgress(status.formatError);
+    //   }
+    // }
+    // parseCSVData();
+
+    // -------- Method 2: Papa.parse(): upload and parse data ---------
     try {
-      // throw new Error("File format is incorrect!");
+      // throw new Error("File format is incorrect!"); //for testing
       Papa.parse(fileInfo, {
         header: true,
         skipEmptyLines: true,
+        // delimiter: "\t",
         complete: function (results) {
           console.log(results.data);
 
-          // const rowsArray = [];
-          // const valuesArray = [];
-
-          // // Iterating data to get column name and their values
-          // results.data.map((d) => {
-          //   rowsArray.push(Object.keys(d));
-          //   valuesArray.push(Object.values(d));
-          // });
-          // setProgress(status.analysed);
-
-          // axios api
+          // Prepare parsed data for later upload
+          setParsedData(results.data);
 
           // Calculate Time Left: (file size / internet upload speed)
-          setTimeLeft(new Date("2023-06-19T23:09:00") - new Date());
+          // console.log(fileInfo.size, fileInfo.size / uploadSpeed);
+          setTimeLeft(fileInfo.size / uploadSpeed);
 
           // Render Uploading Page
           setProgress(status.uploading);
@@ -117,8 +182,59 @@ export default function Fileuploader() {
     }
   };
 
+  const renderUploadPage = () => {
+    console.log("renderUploadPage");
+    setMessage("");
+    setFileInfo(null);
+    setProgress(status.initial);
+    // setTimeLeft(0);
+    setParsedData(null);
+    // setUploadProgress(0);
+    return;
+  };
+
   const renderProgressBar = () => {
-    console.log(progress);
+    console.log("renderProgressBar");
+    if (progress === status.uploading) {
+      // upload to db server
+      const API_URL = "http://localhost:8080" + "/api/file";
+      const config = {
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Content-Type": "application/json",
+        },
+        onUploadProgress: function (progressEvent) {
+          let percentCompleted = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+          );
+          setUploadProgress(percentCompleted);
+          console.log(
+            `${progressEvent.loaded} KB of total ${progressEvent.total} | ${percentCompleted}%`
+          );
+        },
+      };
+      const body = {
+        filename: fileInfo.name,
+        filesize: fileInfo.size, // chunked size
+        created: new Date(),
+        data: parsedData,
+      };
+      console.log(body);
+
+      axios
+        .post(API_URL, body, config)
+        // .get(API_URL)
+        .then((res) => {
+          console.log(res);
+          setProgress(status.uploaded);
+        })
+        .catch((err) => {
+          console.log(err);
+          setMessage(err.message);
+          setProgress(status.uploadError);
+        });
+    }
+
     if (progress === status.analysing) {
       return <div className="progress-bar-spinner"></div>;
     } else {
@@ -136,6 +252,7 @@ export default function Fileuploader() {
   };
 
   const renderProgressDescription = () => {
+    console.log("renderProgressDescription");
     switch (progress) {
       case status.analysing:
         return <p>Analysing...</p>;
@@ -147,7 +264,7 @@ export default function Fileuploader() {
         return <p>Uploading...</p>;
       case status.uploaded:
         return <p>Uploaded!</p>;
-      case status.dbDisconnedted:
+      case status.uploadError:
         return <p>Upload Failed!</p>;
       default:
         return;
@@ -155,6 +272,7 @@ export default function Fileuploader() {
   };
 
   const renderProgressStatus = () => {
+    console.log("renderProgressStatus");
     let timeObj = timeConverter(timeLeft);
     // console.log(timeLeft);
     // console.log(timeObj);
@@ -169,7 +287,7 @@ export default function Fileuploader() {
           </div>
         </div>
       );
-    } else if ([status.formatError, status.dbDisconnedted].includes(progress)) {
+    } else if ([status.formatError, status.uploadError].includes(progress)) {
       return (
         <div className="progress-error">
           {/* Error message  */}
@@ -185,19 +303,24 @@ export default function Fileuploader() {
   };
 
   const renderProgressLink = () => {
+    console.log("renderProgressLink");
     switch (progress) {
       case status.uploaded:
         return (
-          <p>
-            Would you like to upload a new file?
-            <br />
-            <span onClick={renderUploadPage}>
-              <BsArrowRightShort /> Back to upload page
-            </span>
-          </p>
+          <>
+            <p>
+              Would you like to upload a new file?{" "}
+              <span onClick={renderUploadPage}>Back to upload page</span>
+            </p>
+            <div className="progress-link-fireworks">
+              <img src="./images/fireworks.png" alt="" id="fireworks1" />
+              <img src="./images/fireworks1.png" alt="" id="fireworks2" />
+              <img src="./images/fireworks2.png" alt="" id="fireworks3" />
+            </div>
+          </>
         );
       case status.formatError:
-      case status.dbDisconnedted:
+      case status.uploadError:
         return (
           <p>
             <span onClick={renderUploadPage}>
@@ -210,14 +333,8 @@ export default function Fileuploader() {
     }
   };
 
-  const renderUploadPage = () => {
-    setMessage("");
-    setFileInfo(null);
-    setProgress(status.initial);
-    return;
-  };
-
   useEffect(() => {
+    console.log("Timer Countdown");
     const timer = setTimeout(() => {
       setTimeLeft(timeLeft - 1000);
     }, 1000);
@@ -242,7 +359,6 @@ export default function Fileuploader() {
               onDragOver={dragOverHandler}
               onDrop={dropHandler}
             >
-              {/* <div className="upload-file"></div> */}
               {/* <img
                 className="upload-icon"
                 src="./images/icons-upload-96.png"
@@ -258,7 +374,7 @@ export default function Fileuploader() {
                   id="upload-label"
                   name="upload-label"
                   onChange={chooseHandler}
-                  accept=".csv"
+                  // accept=".csv"
                 />
                 <label for="upload-label">
                   <span>Choose a file</span> or drag it here!

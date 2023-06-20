@@ -21,6 +21,8 @@ createBtn.addEventListener("click", () => {
 
   // create data
   data = [];
+  csvContent = "";
+
   const withHeader = document.querySelector("#header");
   // create header for data
   if (withHeader.checked) {
@@ -35,7 +37,9 @@ createBtn.addEventListener("click", () => {
   for (let i = 1; i <= randomRow; i++) {
     let rowData = [];
     for (let j = 1; j <= randomCol; j++) {
-      rowData.push(Math.floor(Math.random() * 10) + "fasdfgasgasdfasdfasdaf5"); // !! dynamic content
+      rowData.push(
+        Math.floor(Math.random() * randomCol) + "fasdfgasgasdfasdfasdaf5"
+      ); // !! dynamic content
     }
     data.push(rowData);
   }

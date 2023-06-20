@@ -22,6 +22,7 @@ The UI diagram is designed with Figma (<a href="https://www.figma.com/file/Icajm
 </figure>
 
 <br/>
+<br/>
 
 ## Introduction to Functions
 
@@ -66,8 +67,10 @@ The UI diagram is designed with Figma (<a href="https://www.figma.com/file/Icajm
    ...
 
    3-2. Uploaded
-
-   ...
+    <figure>
+       <img src="./other/Uploaded.gif"  width="50%" >
+       <figcaption>Fig.  - A File Uploaded  </figcaption>
+   </figure>
 
 4. ### Create a csv file in random size
 
@@ -104,7 +107,9 @@ The UI diagram is designed with Figma (<a href="https://www.figma.com/file/Icajm
     2-3. Using Python. This method needs developers to package programming codes as an application for non-programming user.
 
 3.  **[MongoDB]**
-    MongoDB Atlas provides a free plan for creating a cluster (database) up to 512 MB. According to assumption, the size of upload file is between 1 GB to 5 GB. The following are possible solutions:
+    MongoDB Atlas provides a free plan for creating a cluster (database) up to 512 MB. According to assumption, the size of upload file is between 1 GB to 5 GB.
+
+    Possible solutions:
 
     3-1. If data will not be selected or searched based on content, the upload file can be converted into binary file. The binary file can be chunked and stored discretely in different clusters (database). These storing clusters will be handled by a higher level of cluster to manage the file info and storage info.
 
@@ -128,7 +133,7 @@ The UI diagram is designed with Figma (<a href="https://www.figma.com/file/Icajm
 4.  **[Estimate Time]**
     In usual, estimate time should be adjusted dynamically based on internet speed (upload, not download) and the file size which is waiting for upload. Unless we indeedly upload a data to server and execute the runtimes, it is not easy to get the internet speed.
 
-    Possible solution:
+    Possible solutions:
 
     4-1. Upload 10 MB data to MongoDB and calculate the runtimes. Once the upload completes, delete the data immediately.
 

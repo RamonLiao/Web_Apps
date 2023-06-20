@@ -50,6 +50,14 @@ app.use("/api/testapi", (req, res) => {
 //   });
 // }
 
+app.get("/", (req, res) => {
+  res.send("This is server at port 8080.");
+});
+
+app.get("*", (req, res) => {
+  res.redirect("/");
+});
+
 // Back-end Server
 app.listen(port, () => {
   console.log("Server is running on port " + port + ".");
