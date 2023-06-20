@@ -67,7 +67,7 @@ createBtn.addEventListener("click", () => {
   if (blob.size < 1000) {
     filesize = blob.size + " Bytes";
   } else if (blob.size >= 10 * 3 && blob.size < 10 ** 6) {
-    filesize = Math.round((blob.size / 1000) * 100) / 100 + " KB";
+    filesize = Math.round((blob.size / 1000) * 100) / 100 + " KB"; // using 1024 as a denominator is more accurate.
   } else if (blob.size >= 10 ** 6 && blob.size < 10 ** 9) {
     filesize = Math.round((blob.size / 1000000) * 100) / 100 + " MB";
   } else if (blob.size >= 10 ** 9) {

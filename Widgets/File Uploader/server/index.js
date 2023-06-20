@@ -30,6 +30,9 @@ app.use(cors());
 // routes
 app.use("/api/file", fileRoute);
 
+app.use("/api/testapi", (req, res) => {
+  res.send("This is test API.");
+});
 // // URL/
 // if (
 //   process.env.NODE_ENV === "production" ||

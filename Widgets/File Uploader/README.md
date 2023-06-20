@@ -23,7 +23,7 @@ The UI diagram is designed with Figma (<a href="https://www.figma.com/file/Icajm
 
 <br/>
 
-## Functrions
+## Introduction to Functions
 
 1. ### Upload Phase (Home Page)
 
@@ -51,27 +51,23 @@ The UI diagram is designed with Figma (<a href="https://www.figma.com/file/Icajm
 
 2. ### Analysis Phase
 
-...
+   2-1. Analysing
+   <figure>
+       <img src="./other/Analysing.gif"  width="50%" >
+       <figcaption>Fig.  - Analysing A File </figcaption>
+   </figure>
 
-#### 2-1. Analysing
-
-...
-
-#### 2-2. Analysed
-
-...
+   2-2. Analysed (deprecated)
 
 3. ### Upload Phase
 
-...
+   3-1. Uploading
 
-#### 3-1. Uploading
+   ...
 
-...
+   3-2. Uploaded
 
-#### 3-2. Uploaded
-
-...
+   ...
 
 4. ### Create a csv file in random size
 
@@ -111,6 +107,7 @@ The UI diagram is designed with Figma (<a href="https://www.figma.com/file/Icajm
     MongoDB Atlas provides a free plan for creating a cluster (database) up to 512 MB. According to assumption, the size of upload file is between 1 GB to 5 GB. The following are possible solutions:
 
     3-1. If data will not be selected or searched based on content, the upload file can be converted into binary file. The binary file can be chunked and stored discretely in different clusters (database). These storing clusters will be handled by a higher level of cluster to manage the file info and storage info.
+
     ```
     |----- Cluster Manage (512 MB) : file info, file storage info
     |----- Cluster 1 (512 MB) : Chunked file 1
@@ -120,9 +117,23 @@ The UI diagram is designed with Figma (<a href="https://www.figma.com/file/Icajm
     ```
 
     3-2. If data is needed to be selected or searched based on content, the dataset can be grouped by columns and be stored discretely in different clusters (database). A cluster can reference another cluster to create a relation. The bonding of reference can simulate the behaviour of relational database.
+
     ```
     |----- Cluster Manage : file info, file columns info
     |----- Cluster 1 : file data (column A, column B, column C, ...), ref (Cluster 2)
     |----- Cluster 2 : file data (column x, column y, column z, ...), ref (Cluster 3)
     |----- ...
     ```
+
+4.  **[Estimate Time]**
+    In usual, estimate time should be adjusted dynamically based on internet speed (upload, not download) and the file size which is waiting for upload. Unless we indeedly upload a data to server and execute the runtimes, it is not easy to get the internet speed.
+
+    Possible solution:
+
+    4-1. Upload 10 MB data to MongoDB and calculate the runtimes. Once the upload completes, delete the data immediately.
+
+    (In RDBMS, this behaviour may result in commit/rollback issues. It is unsure that MongoDb has the similar issue or not. )
+
+    4-2. Download a small-sized file from MongoDB (or other WebSite), calculate the runtimes, and get the runtimes multiplied by 10 as upload time.
+
+    In usual, uppload speeds for home internet are often about 1/10th of the speed of your download speed.
