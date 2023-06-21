@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import Papa from "papaparse";
 import { BsArrowRightShort, BsCloudUploadFill } from "react-icons/bs";
-import axios from "axios";
 import { measureUploadSpeed } from "./testSpeed-component";
+import Papa from "papaparse";
+import axios from "axios";
 
 export default function Fileuploader() {
   const status = {
@@ -336,11 +336,11 @@ export default function Fileuploader() {
   useEffect(() => {
     console.log("Timer Countdown");
     const timer = setTimeout(() => {
-      setTimeLeft(timeLeft - 1000);
+      setTimeLeft((time) => time - 1000);
     }, 1000);
 
     if (timeLeft <= 0) {
-      clearTimeout(timer);
+      return clearTimeout(timer);
     }
 
     return () => {

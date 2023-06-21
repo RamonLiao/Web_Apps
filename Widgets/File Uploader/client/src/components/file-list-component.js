@@ -6,6 +6,39 @@ export default function FileListComponent() {
 
   const API_URL = "http://localhost:8080" + "/api/file";
 
+  const handleDownload = (e) => {
+    console.log(e.target.id);
+    const selectedItem = searchResult.filter(
+      (item) => item._id === e.target.id
+    )[0].data;
+    console.log(selectedItem);
+
+    let blob,
+      csvContent = "";
+    const filename = e.target.id + ".csv";
+    const columns = Object.keys(selectedItem["0"]).length;
+    const rows = selectedItem.length;
+    console.log(columns, rows);
+
+    selectedItem.forEach((row, index) => {
+      if (index === 0) {
+        csvContent += Object.keys(row).join("\t") + "\n";
+      }
+      csvContent += Object.values(row).join("\t") + "\n";
+    });
+    console.log(csvContent);
+
+    blob = new Blob([csvContent], {
+      type: "text/csv;charset=utf-8,",
+    });
+
+    const objUrl = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", objUrl);
+    link.setAttribute("download", filename);
+    link.click();
+  };
+
   const handleDelete = (e) => {
     console.log(e.target.id);
     axios
@@ -46,6 +79,14 @@ export default function FileListComponent() {
               <p className="card-text">File Size: {file.filesize}</p>
               <p className="card-text">Created Date: {file.created}</p>
               <p className="card-text">ID: {file._id}</p>
+              <a
+                href="#"
+                onClick={handleDownload}
+                className="card-text btn btn-primary"
+                id={file._id}
+              >
+                Download
+              </a>
               <a
                 href="#"
                 onClick={handleDelete}

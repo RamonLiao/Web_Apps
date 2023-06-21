@@ -282,6 +282,9 @@ body {
   box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.3);
   cursor: pointer;
 }
+.card a {
+  margin: 0 0.2rem;
+}
 
 @keyframes preloader {
   100% {

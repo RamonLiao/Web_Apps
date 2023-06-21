@@ -21,6 +21,13 @@ The UI diagram is designed with Figma (<a href="https://www.figma.com/file/Icajm
 <figcaption>Fig. 1 - UI Diagram of File Uploader </figcaption>
 </figure>
 
+The outcome
+
+<figure>
+<img src="./other/Demo.gif"  width="80%" >
+<figcaption>Fig. 2 - Upload a CSV File </figcaption>
+</figure>
+
 <br/>
 <br/>
 
@@ -76,13 +83,29 @@ The UI diagram is designed with Figma (<a href="https://www.figma.com/file/Icajm
 
    User can choose to create a csv file with header (default). If 'with header' is choosed, the header counts one row in the total number of rows.
    <figure>
-        <img src="./other/CreateACSV.gif"  width="100%" >
+        <img src="./other/CreateACSV.gif"  width="60%" >
         <figcaption>Fig - Create a CSV file</figcaption>
     </figure>
 
-5. ### Donload a csv file from cloud database (MongoDB)
+5. ### Review files info & Donload a csv file from cloud database (MongoDB)
 
-...
+   URL: "http://localhost:3000/list"
+
+   This component provides review funtion and list all data records which are currently stored in database.
+
+   Button "Download" is available to download the data in tabular format from database to local server.
+
+   <figure>
+        <img src="./other/FileList_Download.gif"  width="60%" >
+        <figcaption>Fig - Download a file</figcaption>
+    </figure>
+
+   Button "Delete" is available to remove the data from database (MongoDB).
+
+    <figure>
+        <img src="./other/FileList_Delete.gif"  width="60%" >
+        <figcaption>Fig - Delete a file</figcaption>
+    </figure>
 
 <br/>
 
@@ -130,15 +153,31 @@ The UI diagram is designed with Figma (<a href="https://www.figma.com/file/Icajm
     |----- ...
     ```
 
-4.  **[Estimate Time]**
+4.  **[MongoDB or Backend Server]**
+    For now, it is unclear that the error is caused by MongoDB API or CORS issue (Access-Control-Allow-Origin).
+    <figure>
+        <img src="./other/apiError.png" width="80%">
+        <figcaption>Fig.  - API Error</figcaption>
+    </figure>
+
+    MongoDB use BSON (Binary + JSON) format to store data. This format has its limitation that the filesize is up to 16 MB. For other massive-sized data, MongoDB provides GridFS protocal to store data.
+
+5.  **[Estimate Time]**
     In usual, estimate time should be adjusted dynamically based on internet speed (upload, not download) and the file size which is waiting for upload. Unless we indeedly upload a data to server and execute the runtimes, it is not easy to get the internet speed.
 
     Possible solutions:
 
-    4-1. Upload 10 MB data to MongoDB and calculate the runtimes. Once the upload completes, delete the data immediately.
+    5-1. Upload 10 MB data to MongoDB and calculate the runtimes. Once the upload completes, delete the data immediately.
 
     (In RDBMS, this behaviour may result in commit/rollback issues. It is unsure that MongoDb has the similar issue or not. )
 
-    4-2. Download a small-sized file from MongoDB (or other WebSite), calculate the runtimes, and get the runtimes multiplied by 10 as upload time.
+    5-2. Download a small-sized file from MongoDB (or other WebSite), calculate the runtimes, and get the runtimes multiplied by 10 as upload time.
 
     In usual, uppload speeds for home internet are often about 1/10th of the speed of your download speed.
+
+6.  **[React Hook]**
+    Deep hooks resulted in partial component rendered repeatedly.
+    <figure>
+        <img src="./other/ReactHooksIssue.png"  width="50%">
+        <figcaption>Fig.  - Deep React Hooks Issue</figcaption>
+    </figure>
