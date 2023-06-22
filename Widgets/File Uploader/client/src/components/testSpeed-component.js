@@ -1,6 +1,6 @@
 export function measureUploadSpeed(uploadSizeInBytes, callback) {
   const xhr = new XMLHttpRequest();
-  const uploadUrl = "http://localhost:8080" + "/api/file"; // Replace with your actual upload URL
+  const uploadUrl = "http://localhost:8080/api/file"; // Replace with your actual upload URL
   const testData = new Uint8Array(uploadSizeInBytes);
 
   // Generate test data with random values
@@ -15,7 +15,8 @@ export function measureUploadSpeed(uploadSizeInBytes, callback) {
       const uploadSpeedInMbps =
         (uploadSizeInBytes * 8) / (durationInSeconds * 1024 * 1024);
       const uploadSpeedInBytes = (uploadSizeInBytes * 8) / durationInSeconds;
-      callback(uploadSpeedInMbps, uploadSpeedInBytes);
+
+      callback(uploadSpeedInMbps, uploadSpeedInBytes, JSON.parse(xhr.response));
     }
   };
 

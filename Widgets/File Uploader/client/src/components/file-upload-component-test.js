@@ -129,107 +129,6 @@ export default function Fileuploader() {
     });
 
     console.log(state["fileInfo"]);
-
-    // Test Upload Speed
-    let uploadSpeed = 0;
-    const uploadSizeInBytes = 10 * 1024 * 1024; // Example upload size: 10 MB
-
-    measureUploadSpeed(
-      uploadSizeInBytes,
-      function (uploadSpeedInMbps, uploadSpeedInBytes) {
-        console.log("Upload Speed:", uploadSpeedInMbps.toFixed(2), "Mbps");
-        console.log("Upload Speed:", uploadSpeedInBytes.toFixed(2), "bps");
-        uploadSpeed = uploadSpeedInBytes;
-      }
-    );
-
-    // -------- Method 1: upload csv file & parse data ---------
-    // throw new Error("File format is incorrect!"); //for testing
-    // function uploadCSVFile(file) {
-    //   return new Promise((resolve, reject) => {
-    //     const reader = new FileReader();
-
-    //     reader.onload = function (event) {
-    //       const fileContent = event.target.result;
-    //       console.log("complete reading");
-    //       resolve(fileContent);
-    //     };
-
-    //     reader.onerror = function (event) {
-    //       reject(event.target.error);
-    //     };
-
-    //     reader.readAsBinaryString(file);
-    //   });
-    // }
-
-    // async function parseCSVData() {
-    //   try {
-    //     const csvContent = await uploadCSVFile(fileInfo);
-    //     console.log(csvContent);
-
-    //     const rows = csvContent.split("\n");
-    //     const dataArray = [];
-
-    //     rows.forEach((row) => {
-    //       const columns = row.split("\t");
-    //       dataArray.push(columns);
-    //     });
-
-    //     console.log(dataArray);
-    //     // Prepare parsed data for later upload
-    //     setParsedData(dataArray);
-
-    //     // Calculate Time Left: (file size / internet upload speed)
-    //     setTimeLeft(new Date("2023-06-19T23:09:00") - new Date());
-
-    //     // Render Uploading Page
-    //     setProgress(status.uploading);
-    //   } catch (err) {
-    //     console.log(err.message);
-    //     setMessage(err.message);
-    //     setProgress(status.formatError);
-    //   }
-    // }
-    // parseCSVData();
-
-    // -------- Method 2: Papa.parse(): upload and parse data ---------
-    try {
-      // throw new Error("File format is incorrect!"); //for testing
-      Papa.parse(state["fileInfo"], {
-        header: true,
-        skipEmptyLines: true,
-        // delimiter: "\t",
-        complete: function (results) {
-          console.log(results.data);
-
-          // // Prepare parsed data for later upload
-          // setParsedData(results.data);
-
-          // // Calculate Time Left: (file size / internet upload speed)
-          // // console.log(fileInfo.size, fileInfo.size / uploadSpeed);
-          // setTimeLeft(fileInfo.size / uploadSpeed);
-
-          // // Render Uploading Page
-          // setProgress(status.uploading);
-          setState({
-            ...state,
-            parsedData: results.data,
-            timeLeft: state["fileInfo"].size / uploadSpeed,
-            currentState: status.uploading,
-          });
-        },
-      });
-    } catch (err) {
-      console.log(err.message);
-      // setMessage(err.message);
-      // setProgress(status.formatError);
-      setState({
-        ...state,
-        message: err.message,
-        currentState: status.formatError,
-      });
-    }
   };
 
   const renderUploadPage = () => {
@@ -252,58 +151,6 @@ export default function Fileuploader() {
 
   const renderProgressBar = () => {
     console.log("renderProgressBar");
-    if (state["currentState"] === status.uploading) {
-      // upload to db server
-      const API_URL = "http://localhost:8080" + "/api/file";
-      const config = {
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-          "Content-Type": "application/json",
-        },
-        onUploadProgress: function (progressEvent) {
-          let percentCompleted = Math.round(
-            (progressEvent.loaded * 100) / progressEvent.total
-          );
-          // setUploadProgress(percentCompleted);
-          setState({
-            ...state,
-            percentCompleted: percentCompleted,
-          });
-          console.log(
-            `${progressEvent.loaded} KB of total ${progressEvent.total} | ${percentCompleted}%`
-          );
-        },
-      };
-      const body = {
-        filename: state["fileInfo"].name,
-        filesize: state["fileInfo"].size, // chunked size
-        created: new Date(),
-        data: state["parsedData"],
-      };
-      console.log(body);
-
-      axios
-        .post(API_URL, body, config)
-        // .get(API_URL)
-        .then((res) => {
-          console.log(res);
-          // setProgress(status.uploaded);
-          setState({
-            ...state,
-            currentState: status.uploaded,
-          });
-        })
-        .catch((err) => {
-          console.log(err);
-          // setMessage(err.message);
-          // setProgress(status.uploadError);
-          setState({
-            ...state,
-            message: err.message,
-            currentState: status.uploadError,
-          });
-        });
-    }
 
     if (state["currentState"] === status.analysing) {
       return <div className="progress-bar-spinner"></div>;
@@ -424,6 +271,164 @@ export default function Fileuploader() {
       clearTimeout(timer);
     };
   }, [state["timeLeft"]]);
+
+  useEffect(() => {
+    if (state["currentState"] === state.analysing) {
+      // Test Upload Speed
+      let uploadSpeed = 0;
+      const uploadSizeInBytes = 10 * 1024 * 1024; // Example upload size: 10 MB
+
+      measureUploadSpeed(
+        uploadSizeInBytes,
+        function (uploadSpeedInMbps, uploadSpeedInBytes) {
+          console.log("Upload Speed:", uploadSpeedInMbps.toFixed(2), "Mbps");
+          console.log("Upload Speed:", uploadSpeedInBytes.toFixed(2), "bps");
+          uploadSpeed = uploadSpeedInBytes;
+        }
+      );
+
+      // -------- Method 1: upload csv file & parse data ---------
+      // throw new Error("File format is incorrect!"); //for testing
+      // function uploadCSVFile(file) {
+      //   return new Promise((resolve, reject) => {
+      //     const reader = new FileReader();
+
+      //     reader.onload = function (event) {
+      //       const fileContent = event.target.result;
+      //       console.log("complete reading");
+      //       resolve(fileContent);
+      //     };
+
+      //     reader.onerror = function (event) {
+      //       reject(event.target.error);
+      //     };
+
+      //     reader.readAsBinaryString(file);
+      //   });
+      // }
+
+      // async function parseCSVData() {
+      //   try {
+      //     const csvContent = await uploadCSVFile(fileInfo);
+      //     console.log(csvContent);
+
+      //     const rows = csvContent.split("\n");
+      //     const dataArray = [];
+
+      //     rows.forEach((row) => {
+      //       const columns = row.split("\t");
+      //       dataArray.push(columns);
+      //     });
+
+      //     console.log(dataArray);
+      //     // Prepare parsed data for later upload
+      //     setParsedData(dataArray);
+
+      //     // Calculate Time Left: (file size / internet upload speed)
+      //     setTimeLeft(new Date("2023-06-19T23:09:00") - new Date());
+
+      //     // Render Uploading Page
+      //     setProgress(status.uploading);
+      //   } catch (err) {
+      //     console.log(err.message);
+      //     setMessage(err.message);
+      //     setProgress(status.formatError);
+      //   }
+      // }
+      // parseCSVData();
+
+      // -------- Method 2: Papa.parse(): upload and parse data ---------
+      try {
+        // throw new Error("File format is incorrect!"); //for testing
+        Papa.parse(state["fileInfo"], {
+          header: true,
+          skipEmptyLines: true,
+          // delimiter: "\t",
+          complete: function (results) {
+            console.log(results.data);
+
+            // // Prepare parsed data for later upload
+            // setParsedData(results.data);
+
+            // // Calculate Time Left: (file size / internet upload speed)
+            // // console.log(fileInfo.size, fileInfo.size / uploadSpeed);
+            // setTimeLeft(fileInfo.size / uploadSpeed);
+
+            // // Render Uploading Page
+            // setProgress(status.uploading);
+            setState({
+              ...state,
+              parsedData: results.data,
+              timeLeft: state["fileInfo"].size / uploadSpeed,
+              currentState: status.uploading,
+            });
+          },
+        });
+      } catch (err) {
+        console.log(err.message);
+        // setMessage(err.message);
+        // setProgress(status.formatError);
+        setState({
+          ...state,
+          message: err.message,
+          currentState: status.formatError,
+        });
+      }
+    }
+
+    if (state["currentState"] === status.uploading) {
+      // upload to db server
+      const API_URL = "http://localhost:8080/api/file";
+      const config = {
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Content-Type": "application/json",
+        },
+        onUploadProgress: function (progressEvent) {
+          let percentCompleted = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+          );
+          // setUploadProgress(percentCompleted);
+          setState({
+            ...state,
+            percentCompleted: percentCompleted,
+          });
+          console.log(
+            `${progressEvent.loaded} KB of total ${progressEvent.total} | ${percentCompleted}%`
+          );
+        },
+      };
+      const body = {
+        filename: state["fileInfo"].name,
+        filesize: state["fileInfo"].size, // chunked size
+        created: new Date(),
+        data: state["parsedData"],
+      };
+      console.log(body);
+
+      axios
+        .post(API_URL, body, config)
+        // .get(API_URL)
+        .then((res) => {
+          console.log(res);
+          // setProgress(status.uploaded);
+          setState({
+            ...state,
+            currentState: status.uploaded,
+          });
+        })
+        .catch((err) => {
+          console.log(err);
+          // setMessage(err.message);
+          // setProgress(status.uploadError);
+          setState({
+            ...state,
+            message: err.message,
+            currentState: status.uploadError,
+          });
+        });
+    }
+  }, [state["currentState"]]);
 
   return (
     <>

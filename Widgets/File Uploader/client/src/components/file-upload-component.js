@@ -50,7 +50,7 @@ export default function Fileuploader() {
   };
 
   const dropHandler = (e) => {
-    console.log("dropHandler");
+    // console.log("dropHandler");
     e.preventDefault();
     if (e.dataTransfer.files[0].type !== "text/csv") {
       setFileInfo(null);
@@ -62,7 +62,7 @@ export default function Fileuploader() {
   };
 
   const chooseHandler = (e) => {
-    console.log("chooseHandler");
+    // console.log("chooseHandler");
     if (!e.target.files[0]) {
       setFileInfo(null);
       setMessage("");
@@ -78,7 +78,7 @@ export default function Fileuploader() {
   };
 
   const uploadHandler = (e) => {
-    console.log("uploadHandler");
+    // console.log("uploadHandler");
 
     // Check if a file is selected
     if (!fileInfo) {
@@ -93,7 +93,7 @@ export default function Fileuploader() {
   };
 
   const renderUploadPage = () => {
-    console.log("renderUploadPage");
+    // console.log("renderUploadPage");
     setMessage("");
     setFileInfo(null);
     setProgress(status.initial);
@@ -104,7 +104,7 @@ export default function Fileuploader() {
   };
 
   const renderProgressBar = () => {
-    console.log("renderProgressBar");
+    // console.log("renderProgressBar");
 
     if (progress === status.analysing) {
       return <div className="progress-bar-spinner"></div>;
@@ -123,7 +123,7 @@ export default function Fileuploader() {
   };
 
   const renderProgressDescription = () => {
-    console.log("renderProgressDescription");
+    // console.log("renderProgressDescription");
     switch (progress) {
       case status.analysing:
         return <p>Analysing...</p>;
@@ -143,7 +143,7 @@ export default function Fileuploader() {
   };
 
   const renderProgressStatus = () => {
-    console.log("renderProgressStatus");
+    // console.log("renderProgressStatus");
     let timeObj = timeConverter(timeLeft);
     // console.log(timeLeft);
     // console.log(timeObj);
@@ -174,7 +174,7 @@ export default function Fileuploader() {
   };
 
   const renderProgressLink = () => {
-    console.log("renderProgressLink");
+    // console.log("renderProgressLink");
     switch (progress) {
       case status.uploaded:
         return (
@@ -205,8 +205,35 @@ export default function Fileuploader() {
   };
 
   useEffect(() => {
+    if (progress === status.analysing) {
+      // Test Upload Speed
+      let uploadSpeed = 0;
+      const uploadSizeInBytes = 10 * 1024 * 1024; // Example upload size: 10 MB
+
+      const testSpeed = measureUploadSpeed(
+        uploadSizeInBytes,
+        function (uploadSpeedInMbps, uploadSpeedInBytes, response) {
+          console.log("Upload Speed:", uploadSpeedInMbps.toFixed(2), "Mbps");
+          console.log("Upload Speed:", uploadSpeedInBytes.toFixed(2), "bps");
+          uploadSpeed = uploadSpeedInBytes;
+
+          const API_URL = "http://localhost:8080/api/file";
+          axios
+            .delete(API_URL, { params: { _id: response._id } })
+            .then((res) => {
+              console.log("Test file deleted: ");
+            })
+            .catch((err) => {
+              console.log(err.response.data); // message from back-end server
+            });
+
+          setTimeLeft(fileInfo.size / uploadSpeed);
+        }
+      );
+    }
+
+    // Set up countdown timer
     if (progress === status.uploading) {
-      console.log("Timer Countdown");
       const timer = setTimeout(() => {
         setTimeLeft((time) => time - 1000);
       }, 1000);
@@ -225,19 +252,6 @@ export default function Fileuploader() {
     // let startToUpload = false;
 
     if (progress === status.analysing) {
-      // Test Upload Speed
-      let uploadSpeed = 0;
-      const uploadSizeInBytes = 10 * 1024 * 1024; // Example upload size: 10 MB
-
-      measureUploadSpeed(
-        uploadSizeInBytes,
-        function (uploadSpeedInMbps, uploadSpeedInBytes) {
-          console.log("Upload Speed:", uploadSpeedInMbps.toFixed(2), "Mbps");
-          console.log("Upload Speed:", uploadSpeedInBytes.toFixed(2), "bps");
-          uploadSpeed = uploadSpeedInBytes;
-        }
-      );
-
       // -------- Papa.parse(): upload and parse data ---------
       try {
         // throw new Error("File format is incorrect!"); //for testing
@@ -246,23 +260,18 @@ export default function Fileuploader() {
           skipEmptyLines: true,
           // delimiter: "\t",
           complete: function (results) {
-            console.log(results.data);
+            console.log("This is parsed data: ", results.data);
 
             // Prepare parsed data for later upload
-            console.log("--> Execute setParsedData");
             setParsedData(results.data);
-            console.log("===> ", results.data);
 
             // Calculate Time Left: (file size / internet upload speed)
-            // console.log(fileInfo.size, fileInfo.size / uploadSpeed);
-            console.log("--> Execute setTimeLeft");
-            setTimeLeft(fileInfo.size / uploadSpeed);
-            console.log("===> ", fileInfo.size / uploadSpeed);
+            // console.log("--> Execute setTimeLeft");
+            // setTimeLeft(fileInfo.size / uploadSpeed);
+            // console.log("===> ", timeLeft);
 
             // Render Uploading Page
-            console.log("--> Execute setProgress");
             setProgress(status.uploading);
-            console.log("===> ", progress);
           },
         });
       } catch (err) {
@@ -284,9 +293,7 @@ export default function Fileuploader() {
           let percentCompleted = Math.round(
             (progressEvent.loaded * 100) / progressEvent.total
           );
-          console.log("--> Execute setUploadProgress");
           setUploadProgress(percentCompleted);
-          console.log("===> ", percentCompleted);
           console.log(
             `${progressEvent.loaded} KB of total ${progressEvent.total} | ${percentCompleted}%`
           );
@@ -298,18 +305,17 @@ export default function Fileuploader() {
         created: new Date(),
         data: parsedData,
       };
-      console.log(body);
+      console.log(">>> This is API body: ", body);
 
       axios
         .post(API_URL, body, config)
-        // .get(API_URL)
         .then((res) => {
           console.log("Uploaded: ", res);
           setProgress(status.uploaded);
         })
         .catch((err) => {
-          console.log(err);
-          setMessage(err.message);
+          console.log(err.response.data); // message from back-end server
+          setMessage(err.message); // Axios message
           setProgress(status.uploadError);
         });
     }
@@ -326,11 +332,6 @@ export default function Fileuploader() {
               onDragOver={dragOverHandler}
               onDrop={dropHandler}
             >
-              {/* <img
-                className="upload-icon"
-                src="./images/icons-upload-96.png"
-                alt="Upload-Icon"
-              /> */}
               <BsCloudUploadFill
                 className="upload-icon"
                 style={{ width: "80px", height: "80px" }}
@@ -365,7 +366,7 @@ export default function Fileuploader() {
         </div>
       )}
       {/* Progress page */}
-      {console.log(progress)}
+      {console.log("Current phase: ", progress)}
       {progress && progress !== status.initial && (
         <div className="progress-group">
           <div className="progress-container">

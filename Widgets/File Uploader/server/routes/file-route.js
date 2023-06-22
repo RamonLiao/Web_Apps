@@ -36,8 +36,11 @@ router.post("/", async (req, res) => {
   });
 
   try {
-    await newFile.save();
-    res.status(200).send("New file has been uploaded.");
+    const result = await newFile.save();
+    console.log(result._id);
+    res
+      .status(200)
+      .send({ message: "New file has been uploaded.", _id: result._id });
   } catch (err) {
     res.status(400).send("Cannot upload files.");
   }
@@ -46,7 +49,7 @@ router.post("/", async (req, res) => {
 // delete file
 router.delete("/", async (req, res) => {
   let { _id } = req.query;
-  // console.log(_id);
+  console.log(req);
 
   let file = await File.findOne({ _id });
   if (!file) {

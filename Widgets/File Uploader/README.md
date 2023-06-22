@@ -115,6 +115,7 @@ The outcome
     Unable to show ":focus" style to "Choose a file" as keyboard navigation (Tab)
 
 2.  **[CSV]**
+
     When creating a csv file by using Javascripot, composing a content string exceeds the compacity of the runtime system.
     <figure>
     <img src="./other/StringError.png" >
@@ -130,6 +131,7 @@ The outcome
     2-3. Using Python. This method needs developers to package programming codes as an application for non-programming user.
 
 3.  **[MongoDB]**
+
     MongoDB Atlas provides a free plan for creating a cluster (database) up to 512 MB. According to assumption, the size of upload file is between 1 GB to 5 GB.
 
     Possible solutions:
@@ -154,6 +156,7 @@ The outcome
     ```
 
 4.  **[MongoDB or Backend Server]**
+
     For now, it is unclear that the error is caused by MongoDB API or CORS issue (Access-Control-Allow-Origin).
     <figure>
         <img src="./other/apiError.png" width="80%">
@@ -163,6 +166,7 @@ The outcome
     MongoDB use BSON (Binary + JSON) format to store data. This format has its limitation that the filesize is up to 16 MB. For other massive-sized data, MongoDB provides GridFS protocal to store data.
 
 5.  **[Estimate Time]**
+
     In usual, estimate time should be adjusted dynamically based on internet speed (upload, not download) and the file size which is waiting for upload. Unless we indeedly upload a data to server and execute the runtimes, it is not easy to get the internet speed.
 
     Possible solutions:
@@ -175,8 +179,9 @@ The outcome
 
     In usual, uppload speeds for home internet are often about 1/10th of the speed of your download speed.
 
-6.  **[React Hook]**
-    Deep hooks resulted in partial component rendered repeatedly.
+6.  ~~**[React Hook]**~~
+
+    ~~Deep hooks resulted in partial component rendered repeatedly.~~
     <figure>
         <img src="./other/ReactHooksIssue.png"  width="50%">
         <figcaption>Fig.  - Deep React Hooks Issue</figcaption>

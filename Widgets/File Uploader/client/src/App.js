@@ -1,8 +1,8 @@
 import "./styles/index.css";
 import React, { useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import FileListComponent from "./components/file-list-component";
 import FileUploadComponent from "./components/file-upload-component";
+import FileListComponent from "./components/file-list-component";
 
 function App() {
   return (
