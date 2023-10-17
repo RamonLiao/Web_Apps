@@ -1,5 +1,6 @@
 # dependencies
 /node_modules
+node_modules
 /.pnp
 .pnp.js
 
@@ -24,7 +25,4 @@ yarn-debug.log*
 yarn-error.log*
 .vercel
 
-.gitignore
-/100-days-of-javascript-master
-100-days-of-javascript-master.zip
 
