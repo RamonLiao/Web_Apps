@@ -221,7 +221,7 @@ export default function Fileuploader() {
           axios
             .delete(API_URL, { params: { _id: response._id } })
             .then((res) => {
-              console.log("Test file deleted: ");
+              console.log("Test ", res.data);
             })
             .catch((err) => {
               console.log(err.response.data); // message from back-end server

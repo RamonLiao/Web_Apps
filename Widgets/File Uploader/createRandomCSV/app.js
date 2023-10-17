@@ -3,6 +3,20 @@ let randomCol, randomRow;
 let blob,
   csvContent = "";
 
+/* Create random text */
+function makeid(length) {
+  let result = "";
+  const characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  const charactersLength = characters.length;
+  let counter = 0;
+  while (counter < length) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    counter += 1;
+  }
+  return result;
+}
+
 /* Create file Handler */
 const createBtn = document.querySelector(".create");
 
@@ -12,8 +26,10 @@ createBtn.addEventListener("click", () => {
   const size = document.querySelector(".size");
 
   // Define random numbers of columns and rows
-  randomCol = Math.floor(Math.random() * 30000); // col < 30000
-  randomRow = Math.floor(Math.random() * (1000 - 10) + 10 + 1); // 10 < row < 1000
+  // randomCol = Math.floor(Math.random() * 30000); // col < 30000
+  // randomRow = Math.floor(Math.random() * (1000 - 10) + 10 + 1); // 10 < row < 1000
+  randomCol = 29999;
+  randomRow = 500;
 
   // Display columns and rows
   columns.innerText = "Columns: " + randomCol;
@@ -21,7 +37,7 @@ createBtn.addEventListener("click", () => {
 
   // create data
   data = [];
-  csvContent = "";
+  csvContent = [];
 
   const withHeader = document.querySelector("#header");
   // create header for data
@@ -36,10 +52,12 @@ createBtn.addEventListener("click", () => {
   // create row data
   for (let i = 1; i <= randomRow; i++) {
     let rowData = [];
+    // let randomText = makeid(20);
     for (let j = 1; j <= randomCol; j++) {
+      // rowData.push(Math.floor(Math.random() * randomCol) + randomText); // !! dynamic content
       rowData.push(
-        Math.floor(Math.random() * randomCol) + "fasdfgasgasdfasdfasdaf5"
-      ); // !! dynamic content
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+      );
     }
     data.push(rowData);
   }
@@ -52,7 +70,8 @@ createBtn.addEventListener("click", () => {
     for (let j = 0; j < rowArray.length; j++) {
       row += rowArray[j] + "\t";
     }
-    csvContent += row + "\n";
+    // csvContent += row + "\n";
+    csvContent.push(row + "\n");
   }
 
   // data.forEach((rowArray) => {
@@ -60,9 +79,10 @@ createBtn.addEventListener("click", () => {
   // });
 
   // csvContent = data.map((row) => row.join("\t")).join("\n");
-
+  console.log(csvContent);
   blob = new Blob([csvContent], {
-    type: "text/csv;charset=utf-8,",
+    // type: "application/csv;charset=utf-8,",
+    type: "text/csv",
   });
 
   // Calculate file size
@@ -96,7 +116,7 @@ downloadBtn.addEventListener("click", () => {
   // });
   const objUrl = URL.createObjectURL(blob);
   const link = document.createElement("a");
-  link.setAttribute("href", objUrl);
-  link.setAttribute("download", filename);
+  link.setAttribute("href", objUrl); // link.href = objUrl;
+  link.setAttribute("download", filename); // link.download = filename;
   link.click();
 });

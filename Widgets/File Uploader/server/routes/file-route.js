@@ -49,7 +49,7 @@ router.post("/", async (req, res) => {
 // delete file
 router.delete("/", async (req, res) => {
   let { _id } = req.query;
-  console.log(req);
+  // console.log(req);
 
   let file = await File.findOne({ _id });
   if (!file) {

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>Usage Example</title>
+  </head>
+  <body>
+    <div class="container"></div>
+
+    <script>
+      const container = document.querySelector(".container");
+      container.addEventListener("load", readClipboard());
+
+      function readClipboard() {
+        navigator.permissions
+          .query({ name: "clipboard-read" })
+          .then((result) => {
+            if (result.state === "granted" || result.state === "prompt") {
+              navigator.clipboard
+                .readText()
+                .then((text) => {
+                  const newCSSObj = JSON.parse(text);
+                  for (const prop in newCSSObj) {
+                    /** Format 1 */
+                    // if (Object.hasOwn(container.style, prop)) {
+                    //   container.style[prop] = newCSSObj[prop];
+                    // }
+
+                    /** Format 2 */
+                    container.style.setProperty(
+                      `${prop}`,
+                      `${newCSSObj[prop]}`
+                    );
+                  }
+                  console.log(text);
+                  console.log(newCSSObj);
+                  console.log(container.style);
+                })
+                .catch((err) => {
+                  console.error("Failed to read clipboard contents: ", err);
+                });
+            }
+          });
+      }
+    </script>
+  </body>
+</html>
