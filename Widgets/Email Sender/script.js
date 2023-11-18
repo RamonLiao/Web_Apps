@@ -1,5 +1,5 @@
 // EmailJS User ID
-emailjs.init("uW8sf4GjjiyR8FyvC");
+emailjs.init(EMAILJS_USERID);
 
 const sendBtn = document.querySelector(".send-btn");
 const result = document.querySelector(".result");
